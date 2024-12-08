@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analisador de Candles</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+    .container {
+      width: 90%;
+      max-width: 600px;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      border-radius: 8px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+    th, td {
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #007bff;
+      color: #fff;
+    }
+    .result {
+      font-size: 18px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Analisador de Candles</h1>
+    <table id="candlestickTable">
+      <thead>
+        <tr>
+          <th>Abertura</th>
+          <th>Fechamento</th>
+          <th>Volume</th>
+          <th>Alta/Baixa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Dados dos candles serão inseridos aqui -->
+      </tbody>
+    </table>
+    <button onclick="analisar()">Analisar Próximo Candle</button>
+    <div class="result" id="resultado"></div>
+  </div>
+
+  <script>
+    // Dados fictícios
+    const candles = [
+      { open: 100, close: 105, volume: 1200 },
+      { open: 105, close: 103, volume: 1100 },
+      { open: 103, close: 107, volume: 1300 },
+      { open: 107, close: 108, volume: 1250 },
+      { open: 108, close: 106, volume: 1400 },
+    ];
+
+    // Preenche a tabela com os candles
+    function preencherTabela() {
+      const tableBody = document.getElementById('candlestickTable').querySelector('tbody');
+      tableBody.innerHTML = '';
+      candles.forEach((candle, index) => {
+        const row = document.createElement('tr');
+        const altaBaixa = candle.close > candle.open ? 'Alta' : 'Baixa';
+        row.innerHTML = `
+          <td>${candle.open}</td>
+          <td>${candle.close}</td>
+          <td>${candle.volume}</td>
+          <td>${altaBaixa}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Analisar o próximo candle
+    function analisar() {
+      const volumes = candles.map(c => c.volume);
+      const medias = volumes.reduce((a, b) => a + b, 0) / candles.length;
+      const ultCandle = candles[candles.length - 1];
+
+      // Simples análise baseada no último candle
+      const probAlta = ultCandle.close > ultCandle.open ? 0.6 : 0.4;
+      const probBaixa = 1 - probAlta;
+
+      const resultado = `
+        Último Candle:
+        <br>Direção: ${ultCandle.close > ultCandle.open ? 'Alta' : 'Baixa'}
+        <br>Volume: ${ultCandle.volume} (Média: ${medias.toFixed(2)})
+        <br>Probabilidade de Alta: ${(probAlta * 100).toFixed(2)}%
+        <br>Probabilidade de Baixa: ${(probBaixa * 100).toFixed(2)}%
+      `;
+      document.getElementById('resultado').innerHTML = resultado;
+    }
+
+    // Inicializar
+    preencherTabela();
+  </script>
+</body>
+</html>
