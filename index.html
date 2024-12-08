@@ -16,13 +16,12 @@
       background-color: #f4f4f4;
     }
     .container {
-      width: 90%;
+      width: 100%;
       max-width: 800px;
       background: #fff;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       padding: 20px;
       border-radius: 8px;
-      box-sizing: border-box;
     }
     h1 {
       text-align: center;
@@ -33,7 +32,7 @@
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
-      font-size: 14px;
+      overflow-x: auto;
     }
     table, th, td {
       border: 1px solid #ddd;
@@ -46,13 +45,6 @@
       background: #007bff;
       color: #fff;
     }
-    td.highlight-green {
-      background-color: #d4edda;
-      color: #155724;
-    }
-    td {
-      transition: background-color 0.3s, color 0.3s;
-    }
     .form-group {
       margin-bottom: 15px;
     }
@@ -64,13 +56,10 @@
       width: 100%;
       padding: 8px;
       box-sizing: border-box;
-      border: 1px solid #ddd;
-      border-radius: 4px;
     }
     .buttons {
       display: flex;
       gap: 10px;
-      flex-wrap: wrap;
     }
     button {
       flex: 1;
@@ -86,16 +75,13 @@
       background: #0056b3;
     }
     .result {
-      font-size: 16px;
+      font-size: 18px;
       text-align: center;
       margin-top: 10px;
     }
     @media (max-width: 600px) {
       table {
         font-size: 12px;
-      }
-      th, td {
-        padding: 6px;
       }
       button {
         font-size: 14px;
@@ -159,27 +145,40 @@
       tableBody.innerHTML = '';
       candles.forEach(candle => {
         const amplitude = candle.max - candle.min;
-        const forcaAmplitudeVol = amplitude / candle.volume;
-        const forcaFechamentoVol = candle.close / candle.volume;
+        const forcaAmplitudeVol = (amplitude / candle.volume).toFixed(4);
+        const forcaFechamentoVol = (candle.close / candle.volume).toFixed(4);
 
-        const amplitudeHighlight = forcaAmplitudeVol > 0.0099 ? 'highlight-green' : '';
-  const fechamentoHighlight = 
-  forcaFechamentoVol < 1 ? 'highlight-green' : 
-  forcaFechamentoVol > 1 ? 'highlight-red' : '';
-
-        const row = `
-          <tr>
-            <td>${candle.open}</td>
-            <td>${candle.close}</td>
-            <td>${candle.max}</td>
-            <td>${candle.min}</td>
-            <td>${candle.volume}</td>
-            <td>${amplitude.toFixed(2)}</td>
-            <td class="${amplitudeHighlight}">${forcaAmplitudeVol.toFixed(2)}</td>
-            <td class="${fechamentoHighlight}">${forcaFechamentoVol.toFixed(2)}</td>
-          </tr>
+        // Adiciona a linha na tabela
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${candle.open}</td>
+          <td>${candle.close}</td>
+          <td>${candle.max}</td>
+          <td>${candle.min}</td>
+          <td>${candle.volume}</td>
+          <td>${amplitude.toFixed(2)}</td>
+          <td>${forcaAmplitudeVol}</td>
+          <td>${forcaFechamentoVol}</td>
         `;
-        tableBody.innerHTML += row;
+
+        // Regras de coloração
+        const forcaAmplitudeCell = row.children[6];
+        const forcaFechamentoCell = row.children[7];
+
+        if (parseFloat(forcaAmplitudeVol) > 0.0099) {
+          forcaAmplitudeCell.style.backgroundColor = 'green';
+          forcaAmplitudeCell.style.color = 'white';
+        }
+
+        if (parseFloat(forcaFechamentoVol) < 1) {
+          forcaFechamentoCell.style.backgroundColor = 'green';
+          forcaFechamentoCell.style.color = 'white';
+        } else {
+          forcaFechamentoCell.style.backgroundColor = 'red';
+          forcaFechamentoCell.style.color = 'white';
+        }
+
+        tableBody.appendChild(row);
       });
     }
 
@@ -212,12 +211,12 @@
 
       const ultimoCandle = candles[candles.length - 1];
       const amplitude = ultimoCandle.max - ultimoCandle.min;
-      const forcaAmplitudeVol = (amplitude / ultimoCandle.volume).toFixed(2);
-      const forcaFechamentoVol = (ultimoCandle.close / ultimoCandle.volume).toFixed(2);
+      const forcaAmplitudeVol = (amplitude / ultimoCandle.volume).toFixed(4);
+      const forcaFechamentoVol = (ultimoCandle.close / ultimoCandle.volume).toFixed(4);
 
       const resultado = `
         Último Candle Analisado:
-        <br>Amplitude: ${amplitude.toFixed(0)}
+        <br>Amplitude: ${amplitude.toFixed(2)}
         <br>Força (Amplitude/Volume): ${forcaAmplitudeVol}
         <br>Força (Fechamento/Volume): ${forcaFechamentoVol}
       `;
