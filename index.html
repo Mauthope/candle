@@ -44,14 +44,24 @@
       background: #007bff;
       color: #fff;
     }
-    .result {
-      font-size: 18px;
-      text-align: center;
-      margin-top: 10px;
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+    .buttons {
+      display: flex;
+      gap: 10px;
     }
     button {
-      display: block;
-      width: 100%;
+      flex: 1;
       padding: 10px;
       background: #007bff;
       color: white;
@@ -63,11 +73,32 @@
     button:hover {
       background: #0056b3;
     }
+    .result {
+      font-size: 18px;
+      text-align: center;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Analisador de Candles</h1>
+    <div class="form-group">
+      <label for="abertura">Abertura</label>
+      <input type="number" id="abertura" placeholder="Digite o valor de abertura">
+    </div>
+    <div class="form-group">
+      <label for="fechamento">Fechamento</label>
+      <input type="number" id="fechamento" placeholder="Digite o valor de fechamento">
+    </div>
+    <div class="form-group">
+      <label for="volume">Volume</label>
+      <input type="number" id="volume" placeholder="Digite o volume">
+    </div>
+    <div class="buttons">
+      <button onclick="adicionarCandle()">Adicionar Candle</button>
+      <button onclick="analisar()">Analisar Próximo Candle</button>
+    </div>
     <table id="candlestickTable">
       <thead>
         <tr>
@@ -81,25 +112,17 @@
         <!-- Dados dos candles serão inseridos aqui -->
       </tbody>
     </table>
-    <button onclick="analisar()">Analisar Próximo Candle</button>
     <div class="result" id="resultado"></div>
   </div>
 
   <script>
-    // Dados fictícios
-    const candles = [
-      { open: 100, close: 105, volume: 1200 },
-      { open: 105, close: 103, volume: 1100 },
-      { open: 103, close: 107, volume: 1300 },
-      { open: 107, close: 108, volume: 1250 },
-      { open: 108, close: 106, volume: 1400 },
-    ];
+    const candles = []; // Array vazio para armazenar os dados dos candles
 
     // Preenche a tabela com os candles
     function preencherTabela() {
       const tableBody = document.getElementById('candlestickTable').querySelector('tbody');
       tableBody.innerHTML = '';
-      candles.forEach((candle, index) => {
+      candles.forEach(candle => {
         const row = document.createElement('tr');
         const altaBaixa = candle.close > candle.open ? 'Alta' : 'Baixa';
         row.innerHTML = `
@@ -112,8 +135,33 @@
       });
     }
 
+    // Adiciona um candle ao array e atualiza a tabela
+    function adicionarCandle() {
+      const abertura = parseFloat(document.getElementById('abertura').value);
+      const fechamento = parseFloat(document.getElementById('fechamento').value);
+      const volume = parseFloat(document.getElementById('volume').value);
+
+      if (isNaN(abertura) || isNaN(fechamento) || isNaN(volume)) {
+        alert('Por favor, insira valores válidos!');
+        return;
+      }
+
+      candles.push({ open: abertura, close: fechamento, volume });
+      preencherTabela();
+
+      // Limpa os campos de entrada
+      document.getElementById('abertura').value = '';
+      document.getElementById('fechamento').value = '';
+      document.getElementById('volume').value = '';
+    }
+
     // Analisar o próximo candle
     function analisar() {
+      if (candles.length === 0) {
+        alert('Adicione pelo menos um candle antes de analisar!');
+        return;
+      }
+
       const volumes = candles.map(c => c.volume);
       const medias = volumes.reduce((a, b) => a + b, 0) / candles.length;
       const ultCandle = candles[candles.length - 1];
@@ -131,9 +179,6 @@
       `;
       document.getElementById('resultado').innerHTML = resultado;
     }
-
-    // Inicializar
-    preencherTabela();
   </script>
 </body>
 </html>
