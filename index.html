@@ -165,9 +165,12 @@
         const forcaAmplitudeCell = row.children[6];
         const forcaFechamentoCell = row.children[7];
 
-        if (parseFloat(forcaAmplitudeVol) > 0.0099) {
-          forcaAmplitudeCell.style.backgroundColor = 'green';
+        if (parseFloat(forcaAmplitudeVol) < 0.0030) {
+          forcaAmplitudeCell.style.backgroundColor = 'red';
           forcaAmplitudeCell.style.color = 'white';
+        } else {
+          forcaFechamentoCell.style.backgroundColor = 'green';
+          forcaFechamentoCell.style.color = 'white';
         }
 
         if (parseFloat(forcaFechamentoVol) < 1) {
