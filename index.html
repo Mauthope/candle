@@ -163,8 +163,9 @@
         const forcaFechamentoVol = candle.close / candle.volume;
 
         const amplitudeHighlight = forcaAmplitudeVol > 0.0099 ? 'highlight-green' : '';
-        const fechamentoHighlight = forcaFechamentoVol < 1 ? 'highlight-green' : '';
-        const fechamentoHighlight = forcaFechamentoVol > 1 ? 'highlight-red' : '';
+        const fechamentoHighlight = 
+  forcaFechamentoVol < 1 ? 'highlight-green' : 
+  forcaFechamentoVol > 1 ? 'highlight-red' : '';
 
         const row = `
           <tr>
