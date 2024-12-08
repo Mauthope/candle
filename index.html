@@ -162,7 +162,7 @@
         const forcaAmplitudeVol = amplitude / candle.volume;
         const forcaFechamentoVol = candle.close / candle.volume;
 
-        const amplitudeHighlight = forcaAmplitudeVol > 0.001 ? 'highlight-green' : '';
+        const amplitudeHighlight = forcaAmplitudeVol > 0.0099 ? 'highlight-green' : '';
         const fechamentoHighlight = forcaFechamentoVol < 1 ? 'highlight-green' : '';
 
         const row = `
