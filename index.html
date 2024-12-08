@@ -17,7 +17,7 @@
     }
     .container {
       width: 90%;
-      max-width: 600px;
+      max-width: 700px;
       background: #fff;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
       padding: 20px;
@@ -92,6 +92,14 @@
       <input type="number" id="fechamento" placeholder="Digite o valor de fechamento">
     </div>
     <div class="form-group">
+      <label for="maxima">Máxima</label>
+      <input type="number" id="maxima" placeholder="Digite o valor de máxima">
+    </div>
+    <div class="form-group">
+      <label for="minima">Mínima</label>
+      <input type="number" id="minima" placeholder="Digite o valor de mínima">
+    </div>
+    <div class="form-group">
       <label for="volume">Volume</label>
       <input type="number" id="volume" placeholder="Digite o volume">
     </div>
@@ -104,7 +112,10 @@
         <tr>
           <th>Abertura</th>
           <th>Fechamento</th>
+          <th>Máxima</th>
+          <th>Mínima</th>
           <th>Volume</th>
+          <th>Amplitude</th>
           <th>Alta/Baixa</th>
         </tr>
       </thead>
@@ -123,15 +134,20 @@
       const tableBody = document.getElementById('candlestickTable').querySelector('tbody');
       tableBody.innerHTML = '';
       candles.forEach(candle => {
-        const row = document.createElement('tr');
+        const amplitude = (candle.max - candle.min).toFixed(2);
         const altaBaixa = candle.close > candle.open ? 'Alta' : 'Baixa';
-        row.innerHTML = `
-          <td>${candle.open}</td>
-          <td>${candle.close}</td>
-          <td>${candle.volume}</td>
-          <td>${altaBaixa}</td>
+        row = `
+          <tr>
+            <td>${candle.open}</td>
+            <td>${candle.close}</td>
+            <td>${candle.max}</td>
+            <td>${candle.min}</td>
+            <td>${candle.volume}</td>
+            <td>${amplitude}</td>
+            <td>${altaBaixa}</td>
+          </tr>
         `;
-        tableBody.appendChild(row);
+        tableBody.innerHTML += row;
       });
     }
 
@@ -139,20 +155,20 @@
     function adicionarCandle() {
       const abertura = parseFloat(document.getElementById('abertura').value);
       const fechamento = parseFloat(document.getElementById('fechamento').value);
+      const maxima = parseFloat(document.getElementById('maxima').value);
+      const minima = parseFloat(document.getElementById('minima').value);
       const volume = parseFloat(document.getElementById('volume').value);
 
-      if (isNaN(abertura) || isNaN(fechamento) || isNaN(volume)) {
+      if ([abertura, fechamento, maxima, minima, volume].some(isNaN)) {
         alert('Por favor, insira valores válidos!');
         return;
       }
 
-      candles.push({ open: abertura, close: fechamento, volume });
+      candles.push({ open: abertura, close: fechamento, max: maxima, min: minima, volume });
       preencherTabela();
 
       // Limpa os campos de entrada
-      document.getElementById('abertura').value = '';
-      document.getElementById('fechamento').value = '';
-      document.getElementById('volume').value = '';
+      document.querySelectorAll('input').forEach(input => input.value = '');
     }
 
     // Analisar o próximo candle
@@ -163,19 +179,18 @@
       }
 
       const volumes = candles.map(c => c.volume);
-      const medias = volumes.reduce((a, b) => a + b, 0) / candles.length;
-      const ultCandle = candles[candles.length - 1];
+      const amplitudes = candles.map(c => c.max - c.min);
+      const mediasVolume = volumes.reduce((a, b) => a + b, 0) / candles.length;
+      const mediasAmplitude = amplitudes.reduce((a, b) => a + b, 0) / candles.length;
+      const ultimoCandle = candles[candles.length - 1];
 
-      // Simples análise baseada no último candle
-      const probAlta = ultCandle.close > ultCandle.open ? 0.6 : 0.4;
-      const probBaixa = 1 - probAlta;
+      const relacao = (ultimoCandle.volume / (ultimoCandle.max - ultimoCandle.min)).toFixed(2);
 
       const resultado = `
         Último Candle:
-        <br>Direção: ${ultCandle.close > ultCandle.open ? 'Alta' : 'Baixa'}
-        <br>Volume: ${ultCandle.volume} (Média: ${medias.toFixed(2)})
-        <br>Probabilidade de Alta: ${(probAlta * 100).toFixed(2)}%
-        <br>Probabilidade de Baixa: ${(probBaixa * 100).toFixed(2)}%
+        <br>Amplitude: ${(ultimoCandle.max - ultimoCandle.min).toFixed(2)}
+        <br>Relação Volume/Amplitude: ${relacao}
+        <br>Média Volume: ${mediasVolume.toFixed(2)}, Média Amplitude: ${mediasAmplitude.toFixed(2)}
       `;
       document.getElementById('resultado').innerHTML = resultado;
     }
