@@ -173,8 +173,8 @@
             <td>${candle.min}</td>
             <td>${candle.volume}</td>
             <td>${amplitude.toFixed(2)}</td>
-            <td class="${amplitudeHighlight}">${forcaAmplitudeVol.toFixed(4)}</td>
-            <td class="${fechamentoHighlight}">${forcaFechamentoVol.toFixed(4)}</td>
+            <td class="${amplitudeHighlight}">${forcaAmplitudeVol.toFixed(2)}</td>
+            <td class="${fechamentoHighlight}">${forcaFechamentoVol.toFixed(2)}</td>
           </tr>
         `;
         tableBody.innerHTML += row;
@@ -210,12 +210,12 @@
 
       const ultimoCandle = candles[candles.length - 1];
       const amplitude = ultimoCandle.max - ultimoCandle.min;
-      const forcaAmplitudeVol = (amplitude / ultimoCandle.volume).toFixed(4);
-      const forcaFechamentoVol = (ultimoCandle.close / ultimoCandle.volume).toFixed(4);
+      const forcaAmplitudeVol = (amplitude / ultimoCandle.volume).toFixed(2);
+      const forcaFechamentoVol = (ultimoCandle.close / ultimoCandle.volume).toFixed(2);
 
       const resultado = `
         Último Candle Analisado:
-        <br>Amplitude: ${amplitude.toFixed(2)}
+        <br>Amplitude: ${amplitude.toFixed(0)}
         <br>Força (Amplitude/Volume): ${forcaAmplitudeVol}
         <br>Força (Fechamento/Volume): ${forcaFechamentoVol}
       `;
