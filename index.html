@@ -116,7 +116,8 @@
           <th>Mínima</th>
           <th>Volume</th>
           <th>Amplitude</th>
-          <th>Alta/Baixa</th>
+          <th>Força (Amplitude/Vol)</th>
+          <th>Força (Fechamento/Vol)</th>
         </tr>
       </thead>
       <tbody>
@@ -127,31 +128,33 @@
   </div>
 
   <script>
-    const candles = []; // Array vazio para armazenar os dados dos candles
+    const candles = []; // Array para armazenar os dados dos candles
 
-    // Preenche a tabela com os candles
+    // Função para preencher a tabela
     function preencherTabela() {
       const tableBody = document.getElementById('candlestickTable').querySelector('tbody');
       tableBody.innerHTML = '';
       candles.forEach(candle => {
-        const amplitude = (candle.max - candle.min).toFixed(2);
-        const altaBaixa = candle.close > candle.open ? 'Alta' : 'Baixa';
-        row = `
+        const amplitude = candle.max - candle.min;
+        const forcaAmplitudeVol = (amplitude / candle.volume).toFixed(2);
+        const forcaFechamentoVol = (candle.close / candle.volume).toFixed(2);
+        const row = `
           <tr>
             <td>${candle.open}</td>
             <td>${candle.close}</td>
             <td>${candle.max}</td>
             <td>${candle.min}</td>
             <td>${candle.volume}</td>
-            <td>${amplitude}</td>
-            <td>${altaBaixa}</td>
+            <td>${amplitude.toFixed(2)}</td>
+            <td>${forcaAmplitudeVol}</td>
+            <td>${forcaFechamentoVol}</td>
           </tr>
         `;
         tableBody.innerHTML += row;
       });
     }
 
-    // Adiciona um candle ao array e atualiza a tabela
+    // Função para adicionar um candle
     function adicionarCandle() {
       const abertura = parseFloat(document.getElementById('abertura').value);
       const fechamento = parseFloat(document.getElementById('fechamento').value);
@@ -159,8 +162,8 @@
       const minima = parseFloat(document.getElementById('minima').value);
       const volume = parseFloat(document.getElementById('volume').value);
 
-      if ([abertura, fechamento, maxima, minima, volume].some(isNaN)) {
-        alert('Por favor, insira valores válidos!');
+      if ([abertura, fechamento, maxima, minima, volume].some(isNaN) || volume <= 0) {
+        alert('Por favor, insira valores válidos! O volume deve ser maior que zero.');
         return;
       }
 
@@ -171,26 +174,23 @@
       document.querySelectorAll('input').forEach(input => input.value = '');
     }
 
-    // Analisar o próximo candle
+    // Função para analisar o próximo candle
     function analisar() {
       if (candles.length === 0) {
         alert('Adicione pelo menos um candle antes de analisar!');
         return;
       }
 
-      const volumes = candles.map(c => c.volume);
-      const amplitudes = candles.map(c => c.max - c.min);
-      const mediasVolume = volumes.reduce((a, b) => a + b, 0) / candles.length;
-      const mediasAmplitude = amplitudes.reduce((a, b) => a + b, 0) / candles.length;
       const ultimoCandle = candles[candles.length - 1];
-
-      const relacao = (ultimoCandle.volume / (ultimoCandle.max - ultimoCandle.min)).toFixed(2);
+      const amplitude = ultimoCandle.max - ultimoCandle.min;
+      const forcaAmplitudeVol = (amplitude / ultimoCandle.volume).toFixed(2);
+      const forcaFechamentoVol = (ultimoCandle.close / ultimoCandle.volume).toFixed(2);
 
       const resultado = `
-        Último Candle:
-        <br>Amplitude: ${(ultimoCandle.max - ultimoCandle.min).toFixed(2)}
-        <br>Relação Volume/Amplitude: ${relacao}
-        <br>Média Volume: ${mediasVolume.toFixed(2)}, Média Amplitude: ${mediasAmplitude.toFixed(2)}
+        Último Candle Analisado:
+        <br>Amplitude: ${amplitude.toFixed(2)}
+        <br>Força (Amplitude/Volume): ${forcaAmplitudeVol}
+        <br>Força (Fechamento/Volume): ${forcaFechamentoVol}
       `;
       document.getElementById('resultado').innerHTML = resultado;
     }
